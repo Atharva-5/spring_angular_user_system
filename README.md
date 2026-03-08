@@ -71,10 +71,10 @@ authApp/
 ## Database Configuration
 
 **Database:** PostgreSQL  
-**Database Name:** authdb  
-**Port:** 5432  
-**Username:** postgres  
-**Password:** atharva
+**Database Name:** dbName
+**Port:** port
+**Username:** username  
+**Password:** dbPass
 
 ## API Endpoints
 
@@ -125,7 +125,7 @@ Response:
 
 ## Setup & Run
 
-1. Ensure PostgreSQL is running with database `authdb`
+1. Ensure PostgreSQL is running with database `dbName`
 2. Update credentials in `application.properties` if needed
 3. Run the application:
 ```bash
