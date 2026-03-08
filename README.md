@@ -32,7 +32,8 @@ authApp/
 ├── dto/
 │   ├── LoginRequest.java            # Login request payload
 │   ├── RegisterRequest.java         # Registration request payload
-│   └── AuthResponse.java            # Authentication response with token
+│   ├── AuthResponse.java            # Authentication response with token
+│   └── UserResponse.java            # User data response (without password)
 ├── entity/
 │   └── User.java                    # User entity (JPA)
 ├── repository/
@@ -42,6 +43,30 @@ authApp/
 └── service/
     └── AuthService.java             # Business logic for authentication
 ```
+
+## Data Flow
+
+### Registration Flow
+1. Client sends POST `/api/auth/register` with email & password
+2. **AuthController** receives request → calls **AuthService**
+3. **AuthService** encrypts password (BCrypt) → saves user to DB via **UserRepository**
+4. **JwtService** generates JWT token with user email
+5. Returns **AuthResponse** with token to client
+
+### Login Flow
+1. Client sends POST `/api/auth/login` with email & password
+2. **AuthController** receives request → calls **AuthService**
+3. **AuthService** finds user by email from **UserRepository**
+4. Validates password using **PasswordEncoder**
+5. **JwtService** generates JWT token
+6. Returns **AuthResponse** with token to client
+
+### Get Current User Flow
+1. Client sends GET `/api/auth/me` with Bearer token in header
+2. **AuthController** extracts token → calls **AuthService**
+3. **JwtService** decodes token and extracts email
+4. **AuthService** fetches user from **UserRepository**
+5. Returns **UserResponse** (id, email, role) to client
 
 ## Database Configuration
 
@@ -61,6 +86,40 @@ Content-Type: application/json
 {
   "email": "user@example.com",
   "password": "password123"
+}
+
+Response:
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+### Login
+```
+POST /api/auth/login
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "password123"
+}
+
+Response:
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+### Get Current User
+```
+GET /api/auth/me
+Authorization: Bearer <token>
+
+Response:
+{
+  "id": 1,
+  "email": "user@example.com",
+  "role": "USER"
 }
 ```
 
